@@ -37,19 +37,30 @@ app.get("/", async (req,res)=> {
     }
 });
 
-app.post("/index", async (req,res)=> {
+app.post("/index", async (req, res) => {
    try {
-    const { firstname, email, comment, check } = req.body;
-    
-    // Create a new contact
-    const contactInfo = new Contact({ firstname, email, comment, check });
-    await contactInfo.save();
-    
-    res.redirect("/");
+      const { firstname, email, comment, check } = req.body;
+
+      // Check if a contact with the same name and email exists
+      const existingContact = await Contact.findOne({ firstname, email });
+
+      if (existingContact) {
+         // If a contact exists, update the existing document with the new comment
+         existingContact.comment = comment;
+         existingContact.check = check;
+         await existingContact.save();
+         res.redirect("/");
+      } else {
+         // If a contact does not exist, create a new document
+         const contactInfo = new Contact({ firstname, email, comment, check });
+         await contactInfo.save();
+         res.redirect("/");
+      }
    } catch (error) {
-    res.status(400).send(error);
+      res.status(400).send(error);
    }
 });
+
 
 app.listen(port, ()=> {
     console.log(`server is running at port no. ${port}`);
