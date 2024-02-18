@@ -18,7 +18,7 @@ const employeeSchema = new mongoose.Schema({
         type:String
     }
 })
-
+employeeSchema.index({ email: 1 }, { unique: false });
 
 
 const Contact = new mongoose.model("Contact", employeeSchema);
