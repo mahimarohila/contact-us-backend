@@ -18,6 +18,8 @@ const employeeSchema = new mongoose.Schema({
         type:String
     }
 })
+employeeSchema.index({ email: 1, comment: 1 }, { unique: true, partialFilterExpression: { comment: { $exists: true } } });
+
 
 const Contact = new mongoose.model("Contact", employeeSchema);
 
