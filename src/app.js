@@ -27,16 +27,25 @@ app.get('/', (req, res) => {
     // Pass data to your template, including the image URL
     res.render('index', { imageUrl: '../public/img/Monica Bhutani.jpeg' });
   });
-app.post("/index", async(req,res)=> {
+app.get("/", async (req,res)=> {
+    try {
+        // Fetch all contacts
+        const contacts = await Contact.find({});
+        res.render("index", { contacts });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+app.post("/index", async (req,res)=> {
    try {
-    const contactInfo = new Contact({
-        firstname: req.body.firstname,
-        email: req.body.email,
-        comment: req.body.comment,
-        check: req.body.check
-    })
-    const contacted = await contactInfo.save();
-    res.status(201).render("index");
+    const { firstname, email, comment, check } = req.body;
+    
+    // Create a new contact
+    const contactInfo = new Contact({ firstname, email, comment, check });
+    await contactInfo.save();
+    
+    res.redirect("/");
    } catch (error) {
     res.status(400).send(error);
    }
