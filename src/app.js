@@ -41,15 +41,25 @@ app.post("/index", async (req, res) => {
    try {
       const { firstname, email, comment, check } = req.body;
 
-      // Create a new document for each comment
-      const contactInfo = new Contact({ firstname, email, comment, check });
-      await contactInfo.save();
+      // Find the existing contact or create a new one
+      let existingContact = await Contact.findOne({ firstname, email });
 
-      res.redirect("/");
+      if (!existingContact) {
+         // If a contact does not exist, create a new document
+         const contactInfo = new Contact({ firstname, email, comments: [{ comment, check }] });
+         await contactInfo.save();
+         res.redirect("/");
+      } else {
+         // If a contact exists, append the new comment to the existing comments
+         existingContact.comments.push({ comment, check });
+         await existingContact.save();
+         res.redirect("/");
+      }
    } catch (error) {
       res.status(400).send(error);
    }
 });
+
 
 
 
