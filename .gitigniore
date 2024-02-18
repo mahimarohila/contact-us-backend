@@ -1,3 +1,4 @@
 package-lock.json
 node_modules/*
-.env
+contact-us-backend/src/db/.env
+
