@@ -38,27 +38,47 @@ app.get("/", async (req,res)=> {
 });
 
 app.post("/index", async (req, res) => {
-   try {
-      const { firstname, email, comment, check } = req.body;
+  try {
+    const { firstname, email, comment, check } = req.body;
 
-      // Find the existing contact or create a new one
-      let existingContact = await Contact.findOne({ firstname, email });
+    // Find the contact (if any) with the given name and email
+    const existingContact = await Contact.findOne({ firstname, email });
 
-      if (!existingContact) {
-         // If a contact does not exist, create a new document
-         const contactInfo = new Contact({ firstname, email, comments: [{ comment, check }] });
-         await contactInfo.save();
-         res.redirect("/");
-      } else {
-         // If a contact exists, append the new comment to the existing comments
-         existingContact.comments.push({ comment, check });
-         await existingContact.save();
-         res.redirect("/");
-      }
-   } catch (error) {
-      res.status(400).send(error);
-   }
+    // Create a new comment object with timestamp
+    const newComment = {
+      content: comment,
+      timestamp: Date.now(),
+    };
+
+    // If the contact exists:
+    if (existingContact) {
+      // Add the new comment to the existing contact's comments array
+      existingContact.comments.push(newComment);
+      await existingContact.save();
+    } else {
+      // Create a new contact with the original comment and the new comment
+      const contactInfo = new Contact({
+        firstname,
+        email,
+        comments: [
+          {
+            content: comment, // Original comment
+            timestamp: Date.now(), // Timestamp for original comment
+          },
+          newComment, // New comment
+        ],
+        check,
+      });
+      await contactInfo.save();
+    }
+
+    res.redirect("/"); // Or send your preferred success response
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).send("Internal server error"); // Send a generic error response to the client
+  }
 });
+
 
 
 
