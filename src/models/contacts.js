@@ -2,22 +2,24 @@ const mongoose = require("mongoose");
 
 const employeeSchema = new mongoose.Schema({
     firstname :{
-        type:String, 
-        required:true
+        type:String 
+        
     },
     email: {
-        type:String,
-        required:true,
-        unique:true
+        type:String
+       
+       
     },
     comment: {
-        type:String,
-        required:true
+        type:String
+       
     },
     check: {
         type:String
     }
 })
+
+
 
 const Contact = new mongoose.model("Contact", employeeSchema);
 

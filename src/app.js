@@ -27,20 +27,41 @@ app.get('/', (req, res) => {
     // Pass data to your template, including the image URL
     res.render('index', { imageUrl: '../public/img/Monica Bhutani.jpeg' });
   });
-app.post("/index", async(req,res)=> {
+app.get("/", async (req,res)=> {
+    try {
+        // Fetch all contacts
+        const contacts = await Contact.find({});
+        res.render("index", { contacts });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+app.post("/index", async (req, res) => {
    try {
-    const contactInfo = new Contact({
-        firstname: req.body.firstname,
-        email: req.body.email,
-        comment: req.body.comment,
-        check: req.body.check
-    })
-    const contacted = await contactInfo.save();
-    res.status(201).render("index");
+      const { firstname, email, comment, check } = req.body;
+
+      // Check if a contact with the same name and email exists
+      const existingContact = await Contact.findOne({ firstname, email });
+
+      if (existingContact) {
+         // If a contact exists, update the existing document with the new comment
+         existingContact.comment = comment;
+         existingContact.check = check;
+         await existingContact.save();
+         res.redirect("/");
+      } else {
+         // If a contact does not exist, create a new document
+         const contactInfo = new Contact({ firstname, email, comment, check });
+         await contactInfo.save();
+         res.redirect("/");
+      }
    } catch (error) {
-    res.status(400).send(error);
+      res.status(400).send(error);
    }
 });
+
+
 
 app.listen(port, ()=> {
     console.log(`server is running at port no. ${port}`);
