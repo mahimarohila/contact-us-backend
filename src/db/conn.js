@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-mongoose.connect(process.env.MONGO_URL,{
+mongoose.connect("mongodb+srv://mahimarohila600:Mahima1234@ieee.73vilvm.mongodb.net/?retryWrites=true&w=majority",{
     useNewUrlParser:true, 
     useUnifiedTopology: true,
 }).then(()=> {
